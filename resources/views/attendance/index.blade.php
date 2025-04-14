@@ -119,7 +119,7 @@
                                     if ($log->clock_in) {
                                         $remark = 'Clocked In';
 
-                                        $lateTime = \Carbon\Carbon::parse($log->clock_in->format('Y-m-d') . ' 08:00:00');
+                                        $lateTime = \Carbon\Carbon::parse($log->clock_in->format('Y-m-d') . ' 08:05:00');
                                         if ($log->clock_in->greaterThan($lateTime)) {
                                             $remark .= ' - <strong class="text-red-500">LATE</strong>';
                                         }
