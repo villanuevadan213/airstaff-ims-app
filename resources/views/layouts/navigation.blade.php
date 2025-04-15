@@ -30,34 +30,26 @@
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                            <div>{{ Auth::user()->name }}</div>
+            <div class="hidden sm:flex sm:items-center sm:ml-6 relative">
+                <!-- Dropdown Trigger -->
+                <button id="dropdownToggle" class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none">
+                    <span>{{ Auth::user()->name }}</span>
+                    <svg class="ml-1 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
 
-                            <div class="ml-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                <!-- Dropdown Menu -->
+                <div id="dropdownMenu" class="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden">
+                    <form method="POST" action="{{ route('logout') }}" class="px-4 py-2">
+                        @csrf
+                        <button type="submit" class="block w-full text-left text-sm text-red-600 hover:text-red-800">
+                            {{ __('Log Out') }}
                         </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                    </form>
+                </div>
             </div>
 
             <!-- Hamburger -->
@@ -106,3 +98,22 @@
         </div>
     </div>
 </nav>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('dropdownToggle');
+        const menu = document.getElementById('dropdownMenu');
+
+        toggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            menu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    });
+</script>

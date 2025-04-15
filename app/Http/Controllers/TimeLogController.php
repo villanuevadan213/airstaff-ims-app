@@ -3,35 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\TimeLog;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TimeLogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch time logs for the authenticated user
-        $timeLogs = TimeLog::where('user_id', auth()->id())
-                        ->whereDate('clock_in', now()->toDateString())
+        $userId = auth()->id();
+        $query = TimeLog::where('user_id', $userId);
+
+        // Filter by selected month
+        if ($request->has('month')) {
+            try {
+                $month = Carbon::parse($request->month);
+                $query->whereMonth('clock_in', $month->month)
+                    ->whereYear('clock_in', $month->year);
+            } catch (\Exception $e) {
+                // Handle invalid date
+            }
+        }
+
+        $timeLogs = $query->orderBy('clock_in', 'desc')->get();
+
+        // Today’s log (still needed for the Clock In logic)
+        $todayLog = TimeLog::where('user_id', $userId)
+                        ->whereDate('clock_in', Carbon::today())
                         ->get();
 
-        // Compute overtime for each log
-        $timeLogs = $timeLogs->map(function ($log) {
-            $regularHours = 8;
-
-            if ($log->clock_out) {
-                $totalHours = $log->clock_in->diffInHours($log->clock_out);
-                $overtimeHours = $totalHours > $regularHours ? $totalHours - $regularHours : 0;
-                $log->overtime = gmdate('H:i:s', $overtimeHours * 3600);
-            } else {
-                $log->overtime = '';
-            }
-
-            return $log;
-        });
-
-        // Pass the $timeLogs variable to the view
-        return view('attendance.index', compact('timeLogs'));
+        return view('attendance.index', compact('timeLogs', 'todayLog'));
     }
 
 

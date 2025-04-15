@@ -11,7 +11,7 @@
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Clock In / Break / Clock Out</h3>
 
             @php
-                $log = $timeLogs->first();
+                $log = $todayLog->first();
             @endphp
 
             @if(!$log)
@@ -72,6 +72,20 @@
 
         <!-- Time Logs -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 overflow-x-auto">
+            <!-- Filter Section -->
+            <div class="mb-6">
+                <form id="monthFilterForm" method="GET" action="{{ route('attendance.index') }}">
+                    <input
+                        type="month"
+                        name="month"
+                        id="month"
+                        value="{{ request('month', now()->format('Y-m')) }}"
+                        class="border border-gray-300 rounded-md p-2"
+                        onchange="this.form.submit()"
+                    >
+                </form>
+            </div>
+
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Your Time Log Records</h3>
 
             <table class="w-full text-sm text-left text-gray-700 border-collapse">
@@ -130,7 +144,7 @@
                                         if ($breakDuration > 60) {
                                             $remark .= ' - <strong class="text-red-500">Overbreak</strong>';
                                         } else {
-                                            $remark = 'On Break';
+                                            $remark = 'Clocked In';
                                         }
                                     } elseif ($log->break_in && !$log->break_out) {
                                         $remark = 'On Break';
@@ -226,5 +240,16 @@
 
     function closeNoteModal() {
         document.getElementById('noteModal').classList.add('hidden');
+    }
+
+    function initMonthFilter() {
+        const monthInput = document.getElementById('month');
+        const form = document.getElementById('monthFilterForm');
+
+        if (monthInput && form) {
+            monthInput.addEventListener('change', function () {
+                form.submit();
+            });
+        }
     }
 </script>
